@@ -1,34 +1,68 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from "react"
+import ListItem from "./components/ListItem";
+import ClearListButton from "./components/ClearListButton";
+import NewItemButton from "./components/NewItemButton";
 
 function App() {
-  const [count, setCount] = useState(0)
+
+  //localStorage.setItem("listItems", JSON.stringify([1,2,3]));
+  //const info = JSON.parse(localStorage.getItem("listItems"));
+
+
+  const [listItems, setListItems] = useState(
+    JSON.parse(localStorage.getItem("listItems")) || []
+  )
+
+  const handleItemChecked = (e) => {
+    const newList = listItems.map((item) => {
+      if (e.target.name === item.id) {
+        item.checked = !item.checked;
+      }
+      return item;
+    })
+    localStorage.setItem("listItems", JSON.stringify(newList));
+    setListItems(newList);
+  }
 
   return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+    <div className="container text-center mt-2">
+      <div className="row">
+        <div className="col text-start">
+          <h1>Shopping List</h1>
+        </div>
+        <div className="col text-end mt-1">
+          <ClearListButton setListItems={setListItems} />
+          <NewItemButton listItems={listItems} setListItems={setListItems} />
+        </div>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+      <hr />
+      {
+        listItems.length === 0 && (
+          <div>
+            <h3>Your list is empty</h3>
+            Please add new item to start.
+          </div>
+        )
+      }
+      {
+        listItems.map((item) => (
+          <ListItem
+            item={item}
+            handleItemChecked={handleItemChecked}
+            listItems={listItems}
+            setListItems={setListItems}
+          />
+        ))
+      }
+
+      <hr />
+
+      <div className="col text-end">
+        <ClearListButton setListItems={setListItems} />
+        <NewItemButton />
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+
+    </div>
   )
 }
 
